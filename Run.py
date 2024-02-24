@@ -6,7 +6,3 @@ folder = 'songs'
 player = Player.MP3Player(folder)
 print(player.mp3_files)
 player.start()
-
-# from library import Ports
-# ports = Ports.Ports()
-# ports.print()

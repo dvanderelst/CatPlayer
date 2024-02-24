@@ -3,6 +3,7 @@ import pygame
 import time
 from datetime import datetime
 import threading
+import natsort
 
 def get_time_stamp():
     current_time = datetime.now()
@@ -10,8 +11,9 @@ def get_time_stamp():
     return time_str
 
 
-def get_songs(folder_path):
+def get_songs(folder_path, sorted=True):
     files = [file for file in os.listdir(folder_path) if file.endswith('.mp3')]
+    if sorted: files = natsort.natsorted(files)
     return files
 
 
@@ -92,7 +94,6 @@ class MP3Player:
                 self.current_index = -1
                 return
             for event in pygame.event.get():
-                print(event, event.type)
                 if event.type == pygame.QUIT: return
                 else:
                     self.handle_end_event(event)
