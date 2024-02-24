@@ -5,7 +5,7 @@ import time
 folder = 'songs'
 player = Player.MP3Player(folder)
 print(player.mp3_files)
-player.run()
+player.start()
 
 # from library import Ports
 # ports = Ports.Ports()

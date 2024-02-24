@@ -22,11 +22,14 @@ class MP3Player:
         self.mp3_files = get_songs(folder_path)
         self.current_index = -1
         self.events = []
+
         self.pause_auto_skip = False
         self.playing_paused = False
+        self.stop_playing = False
+        self.currently_playing = False
+
         pygame.init()
         pygame.mixer.init()
-        pygame.mixer.music.set_endevent(pygame.USEREVENT)
 
 
     def current_song(self):
@@ -48,6 +51,10 @@ class MP3Player:
             pygame.mixer.music.load(mp3_file)
             pygame.mixer.music.play()
             self.append_event("Playing new song")
+            # Set up the MUSIC_END event here
+            MUSIC_END = pygame.USEREVENT + 1
+            pygame.mixer.music.set_endevent(MUSIC_END)
+
         else:
             self.current_index = -1
             self.append_event("End of playlist reached")
@@ -63,7 +70,7 @@ class MP3Player:
             self.append_event("Song unpaused")
             self.playing_paused = False
 
-    def skip_to_next(self):
+    def skip(self):
         self.pause_auto_skip = True
         pygame.mixer.music.stop()
         self.append_event("Skipped to the next song")
@@ -71,20 +78,34 @@ class MP3Player:
         self.pause_auto_skip = False
 
     def handle_end_event(self, event):
-        if event.type == pygame.USEREVENT:  # Music playback end event
+        if event.type == (pygame.USEREVENT + 1):
             self.append_event("Current song ended.")
             if not self.pause_auto_skip: self.play_next()
 
     def thread_function(self):
         self.play_next()
         while True:
+            if self.stop_playing:
+                pygame.mixer.music.stop()
+                self.append_event('Stopped playing')
+                self.currently_playing = False
+                self.current_index = -1
+                return
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return
+                print(event, event.type)
+                if event.type == pygame.QUIT: return
                 else:
                     self.handle_end_event(event)
 
-
-    def run(self):
+    def start(self):
+        if self.currently_playing: return
+        self.stop_playing = False
         thread = threading.Thread(target=self.thread_function)
         thread.start()
+        self.currently_playing = True
+
+    def stop(self):
+        self.stop_playing = True
+        MUSIC_END = pygame.USEREVENT + 2
+        pygame.mixer.music.set_endevent(MUSIC_END)
+
