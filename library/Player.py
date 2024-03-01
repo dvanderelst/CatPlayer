@@ -29,6 +29,7 @@ class MP3Player:
         self.playing_paused = False
         self.stop_playing = False
         self.currently_playing = False
+        self.last_message = ''
 
         pygame.init()
         pygame.mixer.init()
@@ -43,6 +44,7 @@ class MP3Player:
         time_stamp = get_time_stamp()
         current_song = self.current_song()
         entry = [time_stamp, event, current_song]
+        self.last_message = time_stamp + ' ' + event + ' ' + current_song
         if self.verbose: print(entry)
         self.events.append(entry)
 
@@ -67,9 +69,11 @@ class MP3Player:
             pygame.mixer.music.pause()
             self.append_event("Song paused")
             self.playing_paused = True
-        else:
+
+    def resume(self):
+        if self.playing_paused:
             pygame.mixer.music.unpause()
-            self.append_event("Song unpaused")
+            self.append_event("Song resumed")
             self.playing_paused = False
 
     def skip(self):
