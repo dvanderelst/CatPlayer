@@ -13,8 +13,8 @@ reader = RFID.get_rfid_reader('/dev/ttyUSB0')
 
 pause_antenna = 1
 play_antenna = 2
-output_file = 'output.txt'
 
+output_file = Misc.generate_csv_filename()
 file = open(output_file, "w")
 file.close()
 
