@@ -16,12 +16,15 @@ class FixedLengthQueue:
     def __str__(self):
         return str(list(self.queue))
 
-
+# def get_rfid_reader(port):
+#     baud_rate = 115200
+#     serial_uri = f"alt://{port}?class=VTIMESerial"
+#     reader = serial.serial_for_url(serial_uri, baudrate=baud_rate, timeout=0.1)
+#     return reader
 
 def get_rfid_reader(port):
     baud_rate = 115200
-    serial_uri = f"alt://{port}?class=VTIMESerial"
-    reader = serial.serial_for_url(serial_uri, baudrate=baud_rate, timeout=0.1)
+    reader = serial.Serial(port, baudrate=baud_rate, timeout=0.1)
     return reader
 
 
@@ -54,7 +57,7 @@ def convert_stream_to_records(stream):
     if not stream: return []
     records = []
     cols = columns()
-    timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%s')
+    timestamp = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     for read in stream:
         try:
             read = read.decode('utf-8', errors='replace')
