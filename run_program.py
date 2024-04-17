@@ -37,9 +37,10 @@ while True:
                 if player.currently_playing: player.resume()
                 player_message = player.last_message
 
+        raspberry_pi_time = Player.get_time_stamp()
         time_stamp = box_times[-1]
         current_tag = tags[-1]
-        output_list = [time_stamp, current_tag, player_message, play_music]
+        output_list = [time_stamp, current_tag, player_message, play_music, raspberry_pi_time, str(tags)]
         output = Misc.concatenate(output_list)
         print(output)
         file = open(output_file, "a")
