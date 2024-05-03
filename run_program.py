@@ -21,26 +21,30 @@ file.close()
 player_message = None
 while True:
     stream = reader.readlines()
-    if len(stream)>0: print(stream)
+    if len(stream) > 0: print(stream)
     records = RFID.convert_stream_to_records(stream)
     antennas, events, box_times = RFID.get_antenna_events(records)
     tags = RFID.process_antenna_events(antennas, events)
-
+    
     if 'arrived 1' in tags or 'arrived 2' in tags:
-        if f'arrived {play_antenna}' in tags:
+    
+        last_tag = 'empty'
+        if len(tags) > 0: last_tag = tags[-1]
+    
+        if last_tag == f'arrived {pause_antenna}': #pausing happens here
             if play_music:
                 player.pause()
                 player_message = player.last_message
-        if f'arrived {pause_antenna}' in tags:
+    
+        if last_tag == f'arrived {play_antenna}': #playing or resuming happens here
             if play_music:
                 if not player.currently_playing: player.start()
                 if player.currently_playing: player.resume()
                 player_message = player.last_message
-
+    
         raspberry_pi_time = Player.get_time_stamp()
         time_stamp = box_times[-1]
-        current_tag = tags[-1]
-        output_list = [time_stamp, current_tag, player_message, play_music, raspberry_pi_time, str(tags)]
+        output_list = [time_stamp, last_tag, player_message, play_music, raspberry_pi_time, str(tags)]
         output = Misc.concatenate(output_list)
         print(output)
         file = open(output_file, "a")

@@ -44,7 +44,7 @@ class MP3Player:
         time_stamp = get_time_stamp()
         current_song = self.current_song()
         entry = [time_stamp, event, current_song]
-        self.last_message = time_stamp + ' ' + event + ' ' + current_song
+        self.last_message = time_stamp + ',' + event + ',' + current_song
         if self.verbose: print(entry)
         self.events.append(entry)
 

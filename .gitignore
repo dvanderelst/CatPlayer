@@ -6,3 +6,5 @@
 *.csv
 
 *.zip
+
+library/__pycache__/

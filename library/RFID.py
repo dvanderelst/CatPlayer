@@ -64,7 +64,7 @@ def convert_stream_to_records(stream):
             read = read.rstrip()
             read = read.split(",")
         except:
-            print(read)
+            print('exeception', read)
         if len(cols) == len(read):
             record = {k: v.strip() for k, v in zip(cols, read)}
             record.update({"device_timestamp": timestamp})
@@ -90,7 +90,15 @@ def get_antenna_events(records):
 def process_antenna_events(antennas, events):
     tags = []
     for antenna, event in zip(antennas, events):
-        if event == 'I': tag = 'arrived ' + antenna[1:]
-        if event == 'S': tag = 'left ' + antenna[1:]
-        tags.append(tag)
+        if event == 'I':
+            tag = 'arrived ' + antenna[1:]
+            tags.append(tag)
     return tags
+
+# def process_antenna_events(antennas, events):
+#     tags = []
+#     for antenna, event in zip(antennas, events):
+#         if event == 'I': tag = 'arrived ' + antenna[1:]
+#         if event == 'S': tag = 'left ' + antenna[1:]
+#         tags.append(tag)
+#     return tags
