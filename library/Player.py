@@ -53,10 +53,11 @@ def get_songs(folder_path, sorted=True, randomize=0):
 
 
 class MP3Player:
-    def __init__(self, folder_path):
+    def __init__(self, folder_path, shuffle=True):
         self.verbose = True
+        self.shuffle_songs = shuffle
         self.folder_path = folder_path
-        self.mp3_files = get_songs(folder_path, sorted=False, randomize=100)
+        self.mp3_files = get_songs(folder_path, sorted=True)
         self.current_index = -1
         self.events = []
 
@@ -66,8 +67,21 @@ class MP3Player:
         self.currently_playing = False
         self.last_message = ''
 
+        if self.shuffle_songs: self.shuffle(reshuffle=False)
+
         pygame.init()
         pygame.mixer.init()
+
+    def shuffle(self, reshuffle=True):
+        songs = self.mp3_files.copy()
+        last_song = songs[-1]
+        if len(songs) < 2: return
+        while True:
+            random.shuffle(songs)
+            if self.mp3_files[0] != last_song: break
+        if not reshuffle: random.shuffle(songs) #in this case we don't want to set constraints
+        self.mp3_files = songs
+        self.append_event('Shuffled songs')
 
     def current_song(self):
         if self.current_index == -1: return "None"
@@ -96,6 +110,7 @@ class MP3Player:
         else:
             self.current_index = -1
             self.append_event("End of playlist reached")
+            if self.shuffle_songs: self.shuffle()
             self.play_next()
 
     def pause(self):
