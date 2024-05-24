@@ -4,6 +4,35 @@ import time
 from datetime import datetime
 import threading
 import natsort
+import random
+
+
+def randomize_songs(files, target_length=None):
+    print('here')
+    if not files: return []
+    if target_length is None: target_length = len(files)
+    if len(files) < 2: return files
+    first = random.choice(files)
+    result = [first]
+    while len(result) < target_length:
+        previous = result[-1]
+        possible_next_songs = files.copy()
+        possible_next_songs.remove(previous)
+        next_song = random.choice(possible_next_songs)
+        result.append(next_song)
+
+    previous = result[-2]
+    possible_last_songs = files.copy()
+    possible_last_songs.remove(previous)
+    last_song = random.choice(possible_last_songs)
+    result[-1] = last_song
+    return result
+
+
+
+
+
+
 
 def get_time_stamp():
     current_time = datetime.now()
@@ -11,17 +40,23 @@ def get_time_stamp():
     return time_str
 
 
-def get_songs(folder_path, sorted=True):
+def get_songs(folder_path, sorted=True, randomize=0):
     files = [file for file in os.listdir(folder_path) if file.endswith('.mp3')]
-    if sorted: files = natsort.natsorted(files)
-    return files
+    if sorted:
+        files = natsort.natsorted(files)
+        return files
+    if randomize > 0:
+        length = max(randomize, len(files))
+        files = randomize_songs(files, randomize)
+        return files
+    return None
 
 
 class MP3Player:
     def __init__(self, folder_path):
         self.verbose = True
         self.folder_path = folder_path
-        self.mp3_files = get_songs(folder_path)
+        self.mp3_files = get_songs(folder_path, sorted=False, randomize=100)
         self.current_index = -1
         self.events = []
 
@@ -33,7 +68,6 @@ class MP3Player:
 
         pygame.init()
         pygame.mixer.init()
-
 
     def current_song(self):
         if self.current_index == -1: return "None"
@@ -98,7 +132,8 @@ class MP3Player:
                 self.current_index = -1
                 return
             for event in pygame.event.get():
-                if event.type == pygame.QUIT: return
+                if event.type == pygame.QUIT:
+                    return
                 else:
                     self.handle_end_event(event)
 
@@ -113,4 +148,3 @@ class MP3Player:
         self.stop_playing = True
         MUSIC_END = pygame.USEREVENT + 2
         pygame.mixer.music.set_endevent(MUSIC_END)
-
